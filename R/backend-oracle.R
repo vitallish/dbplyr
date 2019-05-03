@@ -48,17 +48,16 @@ sql_translate_env.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
-      `%in%` = function (x, table){
 
+      `%in%` = function (x, table){
         if (is.sql(table)) {
           out <- build_sql(x, " IN ", table)
-
         }else if(length(table) > 1){
           table <- split(table, ceiling(seq_along(table)/1000))
           out <- build_sql(x, " IN ", table[[1]])
         }
-
         else {
+          # If table is a length 1 vector
           out <- build_sql(x, " IN (", table, ")")
         }
 

@@ -29,3 +29,21 @@ test_that("paste and paste0 translate correctly", {
   expect_equal(trans(paste(x, y)), sql("`x` || ' ' || `y`"))
   expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
 })
+
+test_that("custom %in% is working correctly",{
+  library(stringr)
+  trans <- function(x, con = simulate_oracle()) {
+    translate_sql(!!enquo(x), con = con)
+  }
+  long_or <- trans(x %in% 1:1001)
+  normal_or <- trans(x %in% 1:1000)
+  normal_gen <- trans(x %in% 1:1000, con = simulate_odbc())
+
+  expect_equal(str_count(long_or, "OR"), 1)
+  expect_equal(str_count(long_or, "`x` IN"), 2)
+
+  expect_equal(normal_or, normal_gen)
+
+
+
+})
